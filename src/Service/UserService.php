@@ -11,6 +11,19 @@ class UserService extends Service implements UserServiceInterface
     /**
      * {@inheritdoc}
      */
+    public function autoLogin($next = null) {
+      return $this->consumer->get(
+          '/autologin/:userId',
+          array(':userId' => '{userId}'),
+          is_null($next)
+              ? array()
+              : array('next' => $next)
+      );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getUserInfo()
     {
         return $this->consumer->get(

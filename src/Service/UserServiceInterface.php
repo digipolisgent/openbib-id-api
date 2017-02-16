@@ -9,6 +9,18 @@ use OpenBibIdApi\Value\UserActivities\UserActivities;
 interface UserServiceInterface extends ServiceInterface
 {
     /**
+     * Get the autologin url for the currently logged in user.
+     *
+     * @param string $next
+     *   Page to redirect to after using the autologin url.
+     *
+     * @return \DOMDocument|null
+     *   A \DOMDocument containing the XML from the response, null if HTTP
+     *   status code 204 (No content) was returned.
+     */
+    public function autoLogin($next = null);
+
+    /**
      * Get the user info of the currently logged in user.
      *
      * @return \DOMDocument|null
