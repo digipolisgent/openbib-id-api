@@ -18,6 +18,8 @@ class BibConsumer implements BibConsumerInterface
     const BIB_ACCESS_TOKEN = 'BIB_ACCESS_TOKEN';
     const METHOD_GET = 'GET';
     const METHOD_POST = 'POST';
+    const HINT_LOGIN = 'login';
+    const HINT_REGISTER = 'register';
 
     /**
      * OAuth consumer.
@@ -50,6 +52,14 @@ class BibConsumer implements BibConsumerInterface
     protected $credentials;
 
     /**
+     * Hints where to send the user to when authenticating. Either registration or
+     * login.
+     *
+     * @var string
+     */
+    protected $hint;
+
+    /**
      * Creates a new BibConsumer.
      *
      * @param \OpenBibIdApi\Auth\CredentialsInterface $credentials
@@ -59,6 +69,7 @@ class BibConsumer implements BibConsumerInterface
      */
     public function __construct(CredentialsInterface $credentials, StorageInterface $storage = null)
     {
+        $this->hint = self::HINT_LOGIN;
         $this->credentials = $credentials;
         $this->oauthConfig = array(
             'siteUrl' => $credentials->getEnvironment()->getBaseUrl(),
@@ -72,6 +83,29 @@ class BibConsumer implements BibConsumerInterface
         $this->storage = is_null($storage)
             ? new SessionStorage($credentials->getEnvironment()->getName())
             : $storage;
+    }
+
+    /**
+     * Gets the hint, sent along with the fetchAccessToken request.
+     *
+     * @return string
+     *   Either HINT_LOGIN or HINT_REGISTER.
+     */
+    public function getHint()
+    {
+        return $this->hint;
+    }
+
+
+    /**
+     * Sets the hint, sent along with the fetchAccessToken request.
+     *
+     * @param string $hint
+     *   Either HINT_LOGIN or HINT_REGISTER.
+     */
+    public function setHint($hint)
+    {
+        $this->hint = $hint;
     }
 
     /**
@@ -187,7 +221,7 @@ class BibConsumer implements BibConsumerInterface
      *   status
      *   code 204 (No content) was returned.
      *
-     * @throws BibApi\Exception\BibException
+     * @throws \OpenBibIdApi\Exception\BibException
      *   When any of the 400, 401, 403, 404 or 421 status codes were returned.
      */
     protected function doRequest(Client $client, $url, $options = array())
@@ -206,6 +240,9 @@ class BibConsumer implements BibConsumerInterface
         // Replace query parameters.
         $queryReplacements = $this->getParameterReplacements($options['queryParams'], $token);
         $queryParams = array_merge($options['queryParams'], $queryReplacements);
+
+        // Process query parameters.
+        $queryParams = $this->processQueryParameters($queryParams);
 
         // Set the request uri.
         $client->setUri($this->credentials->getEnvironment()->getBaseUrl() . $url);
@@ -308,7 +345,7 @@ class BibConsumer implements BibConsumerInterface
         if (!$this->hasRequestToken()) {
             $this->consumer->setCallbackUrl($this->getCurrentUri());
             $this->fetchRequestToken();
-            $this->consumer->redirect();
+            $this->consumer->redirect(array('hint' => $this->getHint()));
         }
         try {
             $token = $this->consumer->getAccessToken(
@@ -402,5 +439,24 @@ class BibConsumer implements BibConsumerInterface
             . $_SERVER['HTTP_HOST']
             . '/'
             . ltrim($uri, '/');
+    }
+
+    /**
+     * Processes an array of query parameters to a readable format.
+     *
+     * @param array $queryParams
+     *   The parameters to be processes.
+     *
+     * @return array
+     *   The processed array of query parameters.
+     */
+    protected function processQueryParameters($queryParams)
+    {
+        foreach ($queryParams as $name => $value) {
+            if (is_bool($value)) {
+                $queryParams[$name] = $value ? 'true' : 'false';
+            }
+        }
+        return $queryParams;
     }
 }

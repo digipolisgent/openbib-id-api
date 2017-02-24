@@ -2,8 +2,25 @@
 
 namespace OpenBibIdApi\Service;
 
+use OpenBibIdApi\Value\UserActivities\Hold;
+use OpenBibIdApi\Value\UserActivities\Loan;
+use OpenBibIdApi\Value\UserActivities\UserActivities;
+
 class UserService extends Service implements UserServiceInterface
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function autoLogin($next = null) {
+      return $this->consumer->get(
+          '/autologin/:userId',
+          array(':userId' => '{userId}'),
+          is_null($next)
+              ? array()
+              : array('next' => $next)
+      );
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -58,16 +75,20 @@ class UserService extends Service implements UserServiceInterface
             array(':id' => $accountId)
         );
     }
-
     /**
      * {@inheritdoc}
      */
-    public function getUserActivities($accountId)
+    public function getUserActivities($accountId, $triggerRefresh = false, $includeLoanHistory = true)
     {
-        return $this->consumer->get(
+        $response = $this->consumer->get(
             '/libraryaccounts/:id/activities',
-            array(':id' => $accountId)
+            array(':id' => $accountId),
+            array(
+                'triggerServiceRefresh' => $triggerRefresh,
+                'includeLoanHistory' => $includeLoanHistory,
+            )
         );
+        return UserActivities::fromXml($response);
     }
 
     /**
@@ -113,6 +134,38 @@ class UserService extends Service implements UserServiceInterface
             '/library/list',
             array(),
             array('uid' => '{userId}', 'consumerKey' => $collectionKey)
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function cancelReservation($accountId, Hold $hold)
+    {
+        return $this->consumer->post(
+            '/libraryaccounts/:id/hold/cancel',
+            array(':id' => $accountId),
+            array(
+                'docNumber' => (string) $hold->getLibraryItemMetadata()->getDocNumber(),
+                'itemSequence' => (string) $hold->getSequence(),
+                'recNumber' => (string) $hold->getRequestNumber(),
+                'sequence' => (string) $hold->getSequence(),
+            )
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function renewLoan($accountId, Loan $loan)
+    {
+        return $this->consumer->post(
+            '/libraryaccounts/:id/renew',
+            array(':id' => $accountId),
+            array(
+                'docNumber' => (string) $loan->getLibraryItemMetadata()->getDocNumber(),
+                'itemSequence' => (string) $loan->getItemSequence(),
+            )
         );
     }
 }
