@@ -266,7 +266,7 @@ class BibConsumer implements BibConsumerInterface
         // Below are all possible error codes as described bij de api
         // documentation.
         $statusCode = $response->getStatusCode();
-        switch () {
+        switch ($statusCode) {
             // No content.
             case 204:
                 return null;
