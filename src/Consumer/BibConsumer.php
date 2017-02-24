@@ -265,7 +265,8 @@ class BibConsumer implements BibConsumerInterface
 
         // Below are all possible error codes as described bij de api
         // documentation.
-        switch ($response->getStatusCode()) {
+        $statusCode = $response->getStatusCode();
+        switch ($statusCode) {
             // No content.
             case 204:
                 return null;
@@ -279,6 +280,8 @@ class BibConsumer implements BibConsumerInterface
             case 404:
             // Misdirected request.
             case 421:
+            // Any other undocumented error codes.
+            case $statusCode >= 400:
                 throw new BibException($response->getReasonPhrase(), $response->getStatusCode());
         }
         $doc = new \DOMDocument();
