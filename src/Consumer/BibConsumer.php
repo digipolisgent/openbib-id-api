@@ -91,8 +91,9 @@ class BibConsumer implements BibConsumerInterface
      * @return string
      *   Either HINT_LOGIN or HINT_REGISTER.
      */
-    public function getHint() {
-      return $this->hint;
+    public function getHint()
+    {
+        return $this->hint;
     }
 
 
@@ -102,8 +103,9 @@ class BibConsumer implements BibConsumerInterface
      * @param string $hint
      *   Either HINT_LOGIN or HINT_REGISTER.
      */
-    public function setHint($hint) {
-      $this->hint = $hint;
+    public function setHint($hint)
+    {
+        $this->hint = $hint;
     }
 
     /**
