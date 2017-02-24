@@ -18,6 +18,8 @@ class BibConsumer implements BibConsumerInterface
     const BIB_ACCESS_TOKEN = 'BIB_ACCESS_TOKEN';
     const METHOD_GET = 'GET';
     const METHOD_POST = 'POST';
+    const HINT_LOGIN = 'login';
+    const HINT_REGISTER = 'register';
 
     /**
      * OAuth consumer.
@@ -50,6 +52,14 @@ class BibConsumer implements BibConsumerInterface
     protected $credentials;
 
     /**
+     * Hints where to send the user to when authenticating. Either registration or
+     * login.
+     *
+     * @var string
+     */
+    protected $hint;
+
+    /**
      * Creates a new BibConsumer.
      *
      * @param \OpenBibIdApi\Auth\CredentialsInterface $credentials
@@ -59,6 +69,7 @@ class BibConsumer implements BibConsumerInterface
      */
     public function __construct(CredentialsInterface $credentials, StorageInterface $storage = null)
     {
+        $this->hint = self::HINT_LOGIN;
         $this->credentials = $credentials;
         $this->oauthConfig = array(
             'siteUrl' => $credentials->getEnvironment()->getBaseUrl(),
@@ -72,6 +83,29 @@ class BibConsumer implements BibConsumerInterface
         $this->storage = is_null($storage)
             ? new SessionStorage($credentials->getEnvironment()->getName())
             : $storage;
+    }
+
+    /**
+     * Gets the hint, sent along with the fetchAccessToken request.
+     *
+     * @return string
+     *   Either HINT_LOGIN or HINT_REGISTER.
+     */
+    public function getHint()
+    {
+        return $this->hint;
+    }
+
+
+    /**
+     * Sets the hint, sent along with the fetchAccessToken request.
+     *
+     * @param string $hint
+     *   Either HINT_LOGIN or HINT_REGISTER.
+     */
+    public function setHint($hint)
+    {
+        $this->hint = $hint;
     }
 
     /**
@@ -311,7 +345,7 @@ class BibConsumer implements BibConsumerInterface
         if (!$this->hasRequestToken()) {
             $this->consumer->setCallbackUrl($this->getCurrentUri());
             $this->fetchRequestToken();
-            $this->consumer->redirect();
+            $this->consumer->redirect(array('hint' => $this->getHint()));
         }
         try {
             $token = $this->consumer->getAccessToken(
