@@ -59,6 +59,13 @@ class LibraryItemMetadata implements ValueInterface, FromDomElementInterface
     private $docNumber;
 
     /**
+     * The item ID of the library item.
+     *
+     * @var StringLiteral
+     */
+    private $itemId;
+
+    /**
      * Force the use of static methods to create LibraryItemMetadata objects.
      */
     private function __construct()
@@ -98,6 +105,9 @@ class LibraryItemMetadata implements ValueInterface, FromDomElementInterface
 
         $docNumber = $xml->getElementsByTagName('docNumber');
         $static->docNumber = StringLiteral::fromXml($docNumber);
+
+        $itemId = $xml->getElementsByTagName('itemId');
+        $static->itemId = StringLiteral::fromXml($itemId);
 
         return $static;
     }
@@ -177,5 +187,16 @@ class LibraryItemMetadata implements ValueInterface, FromDomElementInterface
     public function getDocNumber()
     {
         return $this->docNumber;
+    }
+
+    /**
+     * Gets the item ID of the library item.
+     *
+     * @return StringLiteral
+     *   The item ID of the library item.
+     */
+    public function getItemId()
+    {
+        return $this->itemId;
     }
 }

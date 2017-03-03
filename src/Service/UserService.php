@@ -163,7 +163,7 @@ class UserService extends Service implements UserServiceInterface
             '/libraryaccounts/:id/renew',
             array(':id' => $accountId),
             array(
-                'docNumber' => (string) $loan->getLibraryItemMetadata()->getDocNumber(),
+                'itemId' => (string) $loan->getLibraryItemMetadata()->getItemId(),
                 'itemSequence' => (string) $loan->getItemSequence(),
             )
         );
