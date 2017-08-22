@@ -2,6 +2,7 @@
 
 namespace OpenBibIdApi\Service;
 
+use OpenBibIdApi\Value\UserActivities\MembershipConnection;
 use OpenBibIdApi\Value\UserActivities\Hold;
 use OpenBibIdApi\Value\UserActivities\Loan;
 use OpenBibIdApi\Value\UserActivities\UserActivities;
@@ -154,4 +155,32 @@ interface UserServiceInterface extends ServiceInterface
      *   status code 204 (No content) was returned.
      */
     public function renewLoan($accountId, Loan $loan);
+
+    /**
+     * Adds a library membership to an existing user account.
+     *
+     * @param string $accountId
+     *   The id of the library user account.
+     * @param MembershipConnection $connection
+     *   The membership connection object.
+     *
+     * @return \DOMDocument|null
+     *   A \DOMDocument containing the XML from the response, null if HTTP
+     *   status code 204 (No content) was returned.
+     */
+    public function addMembership($accountId, MembershipConnection $connection);
+
+    /**
+     * Deletes a library membership from an existing user account.
+     *
+     * @param string $membershipId
+     *   The ID of the membership.
+     * @param string $logSessionId
+     *   Session ID for optional logging of the user session.
+     *
+     * @return \DOMDocument|null
+     *   A \DOMDocument containing the XML from the response, null if HTTP
+     *   status code 204 (No content) was returned.
+     */
+    public function deleteMembership($membershipId, $logSessionId = null);
 }

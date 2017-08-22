@@ -5,6 +5,7 @@ namespace OpenBibIdApi\Service;
 use OpenBibIdApi\Value\UserActivities\Hold;
 use OpenBibIdApi\Value\UserActivities\Loan;
 use OpenBibIdApi\Value\UserActivities\UserActivities;
+use OpenBibIdApi\Value\UserActivities\MembershipConnection;
 
 class UserService extends Service implements UserServiceInterface
 {
@@ -75,6 +76,7 @@ class UserService extends Service implements UserServiceInterface
             array(':id' => $accountId)
         );
     }
+
     /**
      * {@inheritdoc}
      */
@@ -165,6 +167,37 @@ class UserService extends Service implements UserServiceInterface
             array(
                 'itemId' => (string) $loan->getLibraryItemMetadata()->getItemId(),
                 'itemSequence' => (string) $loan->getItemSequence(),
+            )
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addMembership($accountId, MembershipConnection $connection)
+    {
+        return $this->consumer->post(
+            '/libraryaccounts/connect/:id',
+            array(':id' => $accountId),
+            array(
+                'library' => (string) $connection->getLibrary(),
+                'barcode' => (string) $connection->getBarcode(),
+                'verification' => (string) $connection->getVerification(),
+                'logSessionId' => (string) $connection->getLogSessionId(),
+            )
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function deleteMembership($membershipId, $logSessionId = null)
+    {
+        return $this->consumer->post(
+            '/libraryaccounts/:id/delete',
+            array(':id' => $membershipId),
+            array(
+                'logSessionId' => (string) $logSessionId,
             )
         );
     }
