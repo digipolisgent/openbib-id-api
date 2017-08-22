@@ -45,73 +45,25 @@ class MembershipConnection implements ValueInterface
     /**
      * Builds a MembershipConnection object from an array.
      *
-     * @param array $values
-     *   An array containing the connection values:
+     * @param array $stringLiterals
+     *   An array containing the membership connection values:
      *   - library (string)
      *   - barcode (string)
      *   - verification (string)
      *   - logSessionId (string) (optional)
      *
      * @return MembershipConnection
-     *   An MembershipConnection object
+     *   An MembershipConnection object.
      */
-    public static function fromArray(array $values)
+    public static function fromArray(array $stringLiterals)
     {
-        $class = new static();
+        $static = new static();
 
-        foreach ($values as $property => $value) {
-            $function = 'set' . ucfirst($property);
-
-            if (method_exists(__CLASS__, $function)) {
-                $class->$function($value);
-            }
+        foreach ($stringLiterals as $propertyName => $propertyValue) {
+            $static->$propertyName = StringLiteral::create($propertyValue);
         }
 
-        return $class;
-    }
-
-    /**
-     * Sets the library ID.
-     *
-     * @param StringLiteral $library
-     *    The ID of the library.
-     */
-    public function setLibrary($library)
-    {
-        $this->library = $library;
-    }
-
-    /**
-     * Sets the barcode.
-     *
-     * @param StringLiteral
-     *    The barcode.
-     */
-    public function setBarcode($barcode)
-    {
-        $this->barcode = $barcode;
-    }
-
-    /**
-     * Sets the verification code.
-     *
-     * @param StringLiteral
-     *    The verification code.
-     */
-    public function setVerification($verification)
-    {
-        $this->verification = $verification;
-    }
-
-    /**
-     * Sets the session ID for optional logging of user session.
-     *
-     * @param StringLiteral
-     *    The user session ID.
-     */
-    public function setLogSessionId($logSessionId)
-    {
-        $this->logSessionId = $logSessionId;
+        return $static;
     }
 
     /**
