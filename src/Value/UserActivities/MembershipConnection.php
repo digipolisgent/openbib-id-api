@@ -53,7 +53,7 @@ class MembershipConnection implements ValueInterface
      *   - logSessionId (string) (optional)
      *
      * @return MembershipConnection
-     *   An MembershipConnection object.
+     *   A MembershipConnection object.
      */
     public static function fromArray(array $stringLiterals)
     {
