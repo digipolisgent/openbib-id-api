@@ -191,7 +191,7 @@ class UserService extends Service implements UserServiceInterface
     /**
      * {@inheritdoc}
      */
-    public function deleteMembership($membershipId, $logSessionId = NULL)
+    public function deleteMembership($membershipId, $logSessionId = null)
     {
         return $this->consumer->post(
             '/libraryaccounts/:id/delete',

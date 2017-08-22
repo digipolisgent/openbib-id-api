@@ -182,5 +182,5 @@ interface UserServiceInterface extends ServiceInterface
      *   A \DOMDocument containing the XML from the response, null if HTTP
      *   status code 204 (No content) was returned.
      */
-    public function deleteMembership($membershipId, $logSessionId = NULL);
+    public function deleteMembership($membershipId, $logSessionId = null);
 }

@@ -63,7 +63,7 @@ class MembershipConnection implements ValueInterface
             $function = 'set' . ucfirst($property);
 
             if (method_exists(__CLASS__, $function)) {
-              $class->$function($value);
+                $class->$function($value);
             }
         }
 
